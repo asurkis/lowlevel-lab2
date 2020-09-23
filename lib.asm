@@ -1,12 +1,14 @@
 global exit
 global string_length
 global print_string
+global fprint_string
 global print_char
 global print_newline
 global print_uint
 global print_int
 global read_char
 global read_word
+global read_line
 global parse_uint
 global parse_int
 global string_equals
@@ -32,11 +34,15 @@ string_length:
 
 ; Принимает указатель на нуль-терминированную строку, выводит её в stdout
 print_string:
+  mov rsi, 1
+
+fprint_string:
   call string_length
-  mov rdx, rax
+  mov rdx, rsi
   mov rsi, rdi
+  mov rdi, rdx
+  mov rdx, rax
   mov rax, 1
-  mov rdi, 1
   syscall
   ret
 
@@ -168,6 +174,41 @@ read_word:
   je .word_end
   jmp .loop
 .word_end:
+  cmp r14, r13
+  jge .error
+  mov byte [r12+r14], 0
+  mov rax, r12
+  mov rdx, r14
+  jmp .ret
+.error:
+  xor rax, rax
+  xor rdx, rdx
+.ret:
+  pop r14
+  pop r13
+  pop r12
+  ret
+
+read_line:
+  push r12
+  push r13
+  push r14
+  mov r12, rdi
+  mov r13, rsi
+  mov byte [r12], 0
+  xor r14, r14
+.loop:
+  cmp r14, r13
+  jge .error
+  call read_char
+  test rax, rax
+  jz .line_end
+  cmp rax, 10
+  je .line_end
+  mov [r12+r14], al
+  inc r14
+  jmp .loop
+.line_end:
   cmp r14, r13
   jge .error
   mov byte [r12+r14], 0
