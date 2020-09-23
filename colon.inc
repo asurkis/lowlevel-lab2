@@ -1,3 +1,4 @@
+global _colon_1
 %define _current_ref _colon_%+_current_colon
 %assign _current_colon 1
 
