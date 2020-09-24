@@ -47,6 +47,6 @@ _start:
   mov rdi, error_message_key
   mov rsi, 2
   call fprint_string
-  mov rdi, 1
+  mov rdi, 2
   call exit
 
